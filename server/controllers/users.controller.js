@@ -1,80 +1,56 @@
-const Users = require('mongoose').model('Users');
-const passport = require('passport');
+const Users = require('mongoose').model('Users')
 
 const create = (req, res) => {
-    const { body: { user } } = req;
+    const { body: { user } } = req
 
     if(!user.email) {
-        return res.status(422).json({
-            errors: {
-                email: 'is required',
-            },
-        });
+        return res.json( { errors: { email: 'Is required' } } )
     }
 
     if(!user.password) {
-        return res.status(422).json({
-            errors: {
-                password: 'is required',
-            },
-        });
+        return res.json( { errors: { password: 'Is required' } } )
     }
 
-    const finalUser = new Users(user);
-
-    finalUser.setPassword(user.password);
-
-    return finalUser.save()
-        .then(() => res.json({ user: finalUser.toAuthJSON() }));
-}
-module.exports.create = create;
-
-const login = (req, res, next) => {
-    const { body: { user } } = req;
-
-    if(!user.email) {
-        return res.status(422).json({
-            errors: {
-                email: 'is required',
-            },
-        });
-    }
-
-    if(!user.password) {
-        return res.status(422).json({
-            errors: {
-                password: 'is required',
-            },
-        });
-    }
-
-    return passport.authenticate('local', { session: false }, (err, passportUser, info) => {
-        if(err) {
-            return next(err);
-        }
-
-        if(passportUser) {
-            const user = passportUser;
-            user.token = passportUser.generateJWT();
-
-            return res.json({ user: user.toAuthJSON() });
-        }
-
-        return status(400).info;
-    })(req, res, next);
-}
-module.exports.login = login;
-
-const get = (req, res, next) => {
-    const { payload: { id } } = req;
-
-    return Users.findById(id)
-        .then((user) => {
-            if(!user) {
-                return res.sendStatus(400);
+    Users
+        .findOne({ email: user.email })
+        .then( user => {
+            if ( user ) {
+                res.json( { errors: { email: 'Is already registered.' } } )
             }
+        })
+        .catch( err => console.log(err) )
 
-            return res.json({ user: user.toAuthJSON() });
-        });
+        const finalUser = new Users(user)
+        finalUser.setPassword(user.password)
+        return finalUser.save()
+            .then(() => res.json( { user: finalUser.toAuthJSON() } ))
+
 }
-module.exports.get = get;
+module.exports.create = create
+
+const login = (req, res) => {
+    const { body: { user } } = req
+
+    if(!user.email) {
+        return res.json( { errors: { email: 'Is required' } } )
+    }
+
+    if(!user.password) {
+        return res.json( { errors: { password: 'Is required' } } )
+    }
+
+    Users
+        .findOne( { email: user.email } )
+        .then( usr => {
+            if (!usr) {
+                return res.json( { errors: { email: 'Not registered' } } )
+            }
+            usr.validatePassword( user.password )
+                .then( isValid => isValid ?
+                    res.json( { user: usr.toAuthJSON() } ) :
+                    res.json( { errors: { password: 'Is incorrect' } } )
+                )
+        })
+        .catch( err => console.log(err) )
+}
+module.exports.login = login

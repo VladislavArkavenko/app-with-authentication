@@ -17,10 +17,13 @@
   "author": "Vladislav Arkavenko",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-http-proxy": "^1.5.0",
     "react": "^16.6.3",
-    "react-dom": "^16.6.3"
+    "react-dom": "^16.6.3",
+    "react-router-dom": "^4.3.1",
+    "validator": "^10.9.0"
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",
