@@ -1,5 +1,5 @@
-import Form from '../components/Form'
 import React, { Component } from 'react'
+import Form from '../components/Form'
 import validator from 'validator'
 
 // TODO: Make inputs clear after successful logging.
@@ -21,7 +21,6 @@ class LoginContainer extends Component {
     login (credentials) {
         const headers = new Headers()
         headers.append('Content-Type', 'application/json')
-
         const body = JSON.stringify({ user: credentials })
 
         const options = {
@@ -43,7 +42,6 @@ class LoginContainer extends Component {
                     })
                 } else {
                     alert("Welcome!")
-                    console.log(this.props , "Props")
                     this.props.toggleState() //To make all app know that user is logged in now.
                 }
             })
@@ -52,7 +50,6 @@ class LoginContainer extends Component {
     isValidForm(form) {
         const email = form.email.value
         const password = form.password.value
-
         const err = { ...initState }
 
         if(!validator.isEmail(email)) {
@@ -70,22 +67,25 @@ class LoginContainer extends Component {
 
     handleSubmit (e) {
         e.preventDefault()
-        if( this.isValidForm(e.target) ) {
+        const form = e.target
+        if( this.isValidForm(form) ) {
             this.login({
-                email:    e.target.email.value,
-                password: e.target.password.value
+                email:    form.email.value,
+                password: form.password.value
             })
-            e.target.reset()
+            form.reset()
         }
     }
 
     render() {
+        const { invalidEmail, invalidPassword } = this.state
+
         return (
             < Form
                 title={"Login form."}
-                handleSubmit={this.handleSubmit}
-                invalidEmail={this.state.invalidEmail}
-                invalidPassword={this.state.invalidPassword} />
+                handleSubmit={ this.handleSubmit }
+                invalidEmail={ invalidEmail }
+                invalidPassword={ invalidPassword } />
         )
     }
 }

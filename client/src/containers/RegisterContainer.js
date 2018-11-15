@@ -1,7 +1,7 @@
+import { Redirect } from 'react-router-dom'
 import React, { Component } from 'react'
 import Form from '../components/Form'
 import validator from 'validator'
-import {Redirect} from 'react-router-dom'
 
 const initState = {
     invalidEmail: '',
@@ -13,8 +13,7 @@ class RegisterContainer extends Component {
     constructor(props) {
         super(props)
 
-        this.state = {...initState}
-        this.form = React.createRef() //TODO: It doesn`t work.
+        this.state = { ...initState }
         this.login = this.login.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
     }
@@ -22,7 +21,6 @@ class RegisterContainer extends Component {
     login (credentials) {
         const headers = new Headers()
         headers.append('Content-Type', 'application/json')
-
         const body = JSON.stringify({ user: credentials })
 
         const options = {
@@ -49,12 +47,12 @@ class RegisterContainer extends Component {
                     })
                 }
             })
+            .catch( e => console.log(e) )
     }
 
     isValidForm(form) {
         const email = form.email.value
         const password = form.password.value
-
         const err = { ...initState }
 
         if(!validator.isEmail(email)) {
@@ -65,33 +63,34 @@ class RegisterContainer extends Component {
         }
         this.setState({
             ...err
-        });
+        })
 
         return Object.keys(err).every( key => !err[key] ) //Returns true only if there is no err.
     }
 
     handleSubmit (e) {
         e.preventDefault()
-        if( this.isValidForm(e.target) ) {
+        const form = e.target
+        if( this.isValidForm(form) ) {
             this.login({
-                email:    e.target.email.value,
-                password: e.target.password.value
+                email:    form.email.value,
+                password: form.password.value
             })
-            e.target.reset()
+            form.reset()
         }
     }
 
     render() {
-        if (this.state.redirect) {
-            return <Redirect to={this.props.redirectPath} />
-        }
+        const { redirect, invalidEmail, invalidPassword } = this.state
+
+        if (redirect)  <Redirect to={ this.props.redirectPath } />
 
         return (
             < Form
-                title={"Register form."}
-                handleSubmit={this.handleSubmit}
-                invalidEmail={this.state.invalidEmail}
-                invalidPassword={this.state.invalidPassword} />
+                title={ "Register form." }
+                handleSubmit={ this.handleSubmit }
+                invalidEmail={ invalidEmail }
+                invalidPassword={ invalidPassword } />
         )
     }
 }

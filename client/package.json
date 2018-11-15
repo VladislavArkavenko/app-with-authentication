@@ -12,7 +12,8 @@
   "scripts": {
     "start": "nodemon server",
     "build": "webpack --mode production",
-    "dev:build": "webpack --mode development"
+    "dev:start" : "run-p dev:build start",
+    "dev:build": "webpack -w --mode development"
   },
   "author": "Vladislav Arkavenko",
   "license": "ISC",

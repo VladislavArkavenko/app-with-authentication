@@ -13,7 +13,9 @@ const create = (req, res) => {
         })
         .catch( e => console.log(e) )
 
-    const finalUser = new Users(user).setPassword(password)
+    const finalUser = new Users( { email, password } )
+    finalUser.setPassword(password)
+
     return finalUser
             .save()
             .then( () => res.json( { user: finalUser.toAuthJSON() } ))
